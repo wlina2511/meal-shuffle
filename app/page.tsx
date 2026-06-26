@@ -12,11 +12,16 @@ import { RecipeFormScreen } from "@/components/RecipeFormScreen";
 import { GeneratePlanScreen } from "@/components/GeneratePlanScreen";
 import { ShoppingListScreen } from "@/components/ShoppingListScreen";
 import type { Recipe, Screen } from "@/lib/types";
-
-const RECIPES_STORAGE_KEY = "meal-shuffle-recipes";
-const SELECTED_RECIPES_STORAGE_KEY = "meal-shuffle-selected-recipes";
-const CHECKED_ITEMS_STORAGE_KEY = "meal-shuffle-checked-items";
-const MANUAL_ITEMS_STORAGE_KEY = "meal-shuffle-manual-items";
+import {
+  loadCheckedItemsFromStorage,
+  loadManualIngredientsFromStorage,
+  loadRecipesFromStorage,
+  loadSelectedRecipesFromStorage,
+  saveCheckedItemsToStorage,
+  saveManualIngredientsToStorage,
+  saveRecipesToStorage,
+  saveSelectedRecipesToStorage,
+} from "@/lib/storage";
 
 export default function HomePage() {
   const [screen, setScreen] = useState<Screen>("home");
@@ -36,89 +41,35 @@ export default function HomePage() {
   ]);
 
   useEffect(() => {
-    try {
-      const storedRecipes = window.localStorage.getItem(RECIPES_STORAGE_KEY);
-      const storedSelectedRecipes = window.localStorage.getItem(
-        SELECTED_RECIPES_STORAGE_KEY,
-      );
-      const storedCheckedItems = window.localStorage.getItem(
-        CHECKED_ITEMS_STORAGE_KEY,
-      );
-      const storedManualItems = window.localStorage.getItem(
-        MANUAL_ITEMS_STORAGE_KEY,
-      );
-
-      if (storedRecipes) {
-        const parsedRecipes = JSON.parse(storedRecipes) as Recipe[];
-
-        setRecipes(
-          parsedRecipes.map((recipe) => ({
-            ...recipe,
-            tags: recipe.tags ?? [],
-          })),
-        );
-      }
-
-      if (storedSelectedRecipes) {
-        const parsedSelectedRecipes = JSON.parse(
-          storedSelectedRecipes,
-        ) as Recipe[];
-
-        setSelectedRecipes(
-          parsedSelectedRecipes.map((recipe) => ({
-            ...recipe,
-            tags: recipe.tags ?? [],
-          })),
-        );
-      }
-
-      if (storedCheckedItems) {
-        setCheckedShoppingItems(JSON.parse(storedCheckedItems));
-      }
-      if (storedManualItems) {
-        setManualShoppingIngredients(JSON.parse(storedManualItems));
-      }
-    } catch {
-      window.localStorage.removeItem(RECIPES_STORAGE_KEY);
-      window.localStorage.removeItem(SELECTED_RECIPES_STORAGE_KEY);
-      window.localStorage.removeItem(CHECKED_ITEMS_STORAGE_KEY);
-      window.localStorage.removeItem(MANUAL_ITEMS_STORAGE_KEY);
-    } finally {
-      setIsLoaded(true);
-    }
+    setRecipes(loadRecipesFromStorage());
+    setSelectedRecipes(loadSelectedRecipesFromStorage());
+    setCheckedShoppingItems(loadCheckedItemsFromStorage());
+    setManualShoppingIngredients(loadManualIngredientsFromStorage());
+    setIsLoaded(true);
   }, []);
 
   useEffect(() => {
     if (!isLoaded) return;
 
-    window.localStorage.setItem(RECIPES_STORAGE_KEY, JSON.stringify(recipes));
+    saveRecipesToStorage(recipes);
   }, [recipes, isLoaded]);
 
   useEffect(() => {
     if (!isLoaded) return;
 
-    window.localStorage.setItem(
-      SELECTED_RECIPES_STORAGE_KEY,
-      JSON.stringify(selectedRecipes),
-    );
+    saveSelectedRecipesToStorage(selectedRecipes);
   }, [selectedRecipes, isLoaded]);
 
   useEffect(() => {
     if (!isLoaded) return;
 
-    window.localStorage.setItem(
-      CHECKED_ITEMS_STORAGE_KEY,
-      JSON.stringify(checkedShoppingItems),
-    );
+    saveCheckedItemsToStorage(checkedShoppingItems);
   }, [checkedShoppingItems, isLoaded]);
 
   useEffect(() => {
     if (!isLoaded) return;
 
-    window.localStorage.setItem(
-      MANUAL_ITEMS_STORAGE_KEY,
-      JSON.stringify(manualShoppingIngredients),
-    );
+    saveManualIngredientsToStorage(manualShoppingIngredients);
   }, [manualShoppingIngredients, isLoaded]);
 
   function addRecipe(recipe: Recipe) {
