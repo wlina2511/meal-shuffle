@@ -122,11 +122,18 @@ export function RecipesScreen({
             {importFeedback}
           </p>
         )}
-
         {filteredRecipes.length === 0 ? (
-          <section className="rounded-3xl border border-neutral-800 bg-neutral-900 p-5">
-            <p className="text-sm leading-6 text-neutral-400">
-              Aucune recette ne correspond à cette recherche.
+          <section className="rounded-2xl border border-dashed border-neutral-800 bg-neutral-950 p-6 text-center">
+            <p className="text-base font-medium text-neutral-50">
+              {recipes.length === 0
+                ? "Pas de recettes pour le moment."
+                : "Aucune recette ne correspond à ta recherche."}
+            </p>
+
+            <p className="mt-2 text-sm text-neutral-400">
+              {recipes.length === 0
+                ? "Ajoute une recette manuellement ou importe un fichier .txt pour commencer."
+                : "Essaie avec un autre mot-clé."}
             </p>
           </section>
         ) : (

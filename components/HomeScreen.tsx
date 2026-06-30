@@ -68,7 +68,6 @@ export function HomeScreen({
 
           <button
             onClick={onOpenRecipes}
-            disabled={recipes.length === 0}
             className="rounded-2xl border border-neutral-800 bg-neutral-900 px-5 py-4 text-left text-base font-semibold text-neutral-50 disabled:cursor-not-allowed disabled:opacity-40"
           >
             Mes recettes
