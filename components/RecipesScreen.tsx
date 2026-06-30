@@ -9,6 +9,7 @@ type RecipesScreenProps = {
   onBack: () => void;
   onEditRecipe: (recipe: Recipe) => void;
   onDeleteRecipe: (recipeId: string) => void;
+  onImportRecipes: (text: string) => number;
 };
 
 export function RecipesScreen({
@@ -16,12 +17,29 @@ export function RecipesScreen({
   onBack,
   onEditRecipe,
   onDeleteRecipe,
+  onImportRecipes,
 }: RecipesScreenProps) {
   const [search, setSearch] = useState("");
-
+  const [importFeedback, setImportFeedback] = useState("");
   const filteredRecipes = recipes.filter((recipe) =>
     recipe.name.toLowerCase().includes(search.trim().toLowerCase()),
   );
+  const [isImportOpen, setIsImportOpen] = useState(false);
+  async function handleImportFile(file: File | null) {
+    if (!file) return;
+
+    const text = await file.text();
+    const importedCount = onImportRecipes(text);
+
+    if (importedCount === 0) {
+      setImportFeedback(
+        "Aucune recette importée. Vérifie le format du fichier.",
+      );
+      return;
+    }
+
+    setImportFeedback(`${importedCount} recette(s) importée(s).`);
+  }
 
   return (
     <main className="min-h-screen bg-neutral-950 text-neutral-50">
@@ -54,6 +72,56 @@ export function RecipesScreen({
             className="rounded-2xl border border-neutral-800 bg-neutral-900 px-4 py-3 text-neutral-50 outline-none placeholder:text-neutral-600 focus:border-neutral-500"
           />
         </label>
+
+        <div className="mt-4 mb-6 flex justify-end">
+          {" "}
+          <button
+            type="button"
+            onClick={() => setIsImportOpen((currentValue) => !currentValue)}
+            className="rounded-full border border-zinc-800 bg-zinc-950 px-4 py-2 text-sm font-medium text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-900 hover:text-white"
+          >
+            {isImportOpen ? "Masquer l’import" : "Importer .txt"}
+          </button>
+        </div>
+
+        {isImportOpen && (
+          <section className="mt-3 rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
+            <p className="text-sm leading-6 text-zinc-400">
+              Format attendu : une recette commence par{" "}
+              <span className="font-mono text-zinc-200">
+                # Nom de la recette
+              </span>
+              , puis une ligne optionnelle{" "}
+              <span className="font-mono text-zinc-200">
+                tags: rapide, poulet
+              </span>
+              , puis les ingrédients.
+            </p>
+
+            <label className="mt-4 block">
+              <span className="sr-only">Importer un fichier de recettes</span>
+              <input
+                type="file"
+                accept=".txt,text/plain"
+                onChange={(event) => {
+                  handleImportFile(event.target.files?.[0] ?? null);
+                  event.target.value = "";
+                }}
+                className="block w-full text-sm text-zinc-300 file:mr-4 file:rounded-full file:border-0 file:bg-zinc-800 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-zinc-100 hover:file:bg-zinc-700"
+              />
+            </label>
+
+            {importFeedback && (
+              <p className="mt-3 text-sm text-emerald-400">{importFeedback}</p>
+            )}
+          </section>
+        )}
+
+        {!isImportOpen && importFeedback && (
+          <p className="mt-2 text-right text-sm text-emerald-400">
+            {importFeedback}
+          </p>
+        )}
 
         {filteredRecipes.length === 0 ? (
           <section className="rounded-3xl border border-neutral-800 bg-neutral-900 p-5">

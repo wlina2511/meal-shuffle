@@ -22,6 +22,7 @@ import {
   saveRecipesToStorage,
   saveSelectedRecipesToStorage,
 } from "@/lib/storage";
+import { importRecipesFromText } from "@/lib/importRecipes";
 
 export default function HomePage() {
   const [screen, setScreen] = useState<Screen>("home");
@@ -93,6 +94,17 @@ export default function HomePage() {
     setCheckedShoppingItems([]);
     setEditingRecipe(null);
     setScreen("home");
+  }
+  function importRecipes(text: string) {
+    const importedRecipes = importRecipesFromText(text);
+
+    if (importedRecipes.length === 0) {
+      return 0;
+    }
+
+    setRecipes((currentRecipes) => [...importedRecipes, ...currentRecipes]);
+
+    return importedRecipes.length;
   }
 
   function deleteRecipe(recipeId: string) {
@@ -194,6 +206,7 @@ export default function HomePage() {
           setScreen("edit-recipe");
         }}
         onDeleteRecipe={deleteRecipe}
+        onImportRecipes={importRecipes}
       />
     );
   }
