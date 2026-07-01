@@ -177,7 +177,7 @@ export default function HomePage() {
     return (
       <RecipeFormScreen
         title="Ajouter une recette"
-        onBack={() => setScreen("home")}
+        onBack={() => setScreen("recipes")}
         onSave={addRecipe}
       />
     );
@@ -190,7 +190,7 @@ export default function HomePage() {
         initialRecipe={editingRecipe}
         onBack={() => {
           setEditingRecipe(null);
-          setScreen("home");
+          setScreen("recipes");
         }}
         onSave={updateRecipe}
       />
