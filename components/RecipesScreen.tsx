@@ -11,6 +11,7 @@ type RecipesScreenProps = {
   onEditRecipe: (recipe: Recipe) => void;
   onDeleteRecipe: (recipeId: string) => void;
   onImportRecipes: (text: string) => number;
+  onAddRecipe: () => void;
 };
 
 export function RecipesScreen({
@@ -18,6 +19,7 @@ export function RecipesScreen({
   onBack,
   onEditRecipe,
   onDeleteRecipe,
+  onAddRecipe,
   onImportRecipes,
 }: RecipesScreenProps) {
   const [search, setSearch] = useState("");
@@ -84,6 +86,14 @@ export function RecipesScreen({
         </label>
 
         <div className="mt-4 mb-6 flex flex-wrap justify-start gap-2 sm:justify-end">
+          <button
+            type="button"
+            onClick={onAddRecipe}
+            className="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-black transition hover:bg-emerald-400"
+          >
+            Ajouter une recette
+          </button>
+
           <button
             type="button"
             onClick={() => setIsImportOpen((currentValue) => !currentValue)}

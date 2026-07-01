@@ -207,6 +207,7 @@ export default function HomePage() {
         }}
         onDeleteRecipe={deleteRecipe}
         onImportRecipes={importRecipes}
+        onAddRecipe={() => setScreen("add-recipe")}
       />
     );
   }
@@ -242,7 +243,6 @@ export default function HomePage() {
     <HomeScreen
       recipes={recipes}
       selectedRecipes={selectedRecipes}
-      onAddRecipe={() => setScreen("add-recipe")}
       onOpenRecipes={() => setScreen("recipes")}
       onGeneratePlan={() => setScreen("generate-plan")}
       onOpenShoppingList={() => setScreen("shopping-list")}

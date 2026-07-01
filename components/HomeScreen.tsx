@@ -3,7 +3,6 @@ import type { Recipe } from "@/lib/types";
 type HomeScreenProps = {
   recipes: Recipe[];
   selectedRecipes: Recipe[];
-  onAddRecipe: () => void;
   onOpenRecipes: () => void;
   onGeneratePlan: () => void;
   onOpenShoppingList: () => void;
@@ -13,7 +12,6 @@ type HomeScreenProps = {
 export function HomeScreen({
   recipes,
   selectedRecipes,
-  onAddRecipe,
   onOpenRecipes,
   onGeneratePlan,
   onOpenShoppingList,
@@ -59,13 +57,6 @@ export function HomeScreen({
         </section>
 
         <section className="grid gap-3">
-          <button
-            onClick={onAddRecipe}
-            className="rounded-2xl bg-neutral-50 px-5 py-4 text-left text-base font-semibold text-neutral-950"
-          >
-            Ajouter une recette
-          </button>
-
           <button
             onClick={onOpenRecipes}
             className="rounded-2xl border border-neutral-800 bg-neutral-900 px-5 py-4 text-left text-base font-semibold text-neutral-50 disabled:cursor-not-allowed disabled:opacity-40"
