@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { formatIngredient } from "@/lib/ingredients";
 import type { Recipe } from "@/lib/types";
+import { downloadTextFile, exportRecipesToText } from "@/lib/exportRecipes";
 
 type RecipesScreenProps = {
   recipes: Recipe[];
@@ -40,6 +41,15 @@ export function RecipesScreen({
 
     setImportFeedback(`${importedCount} recette(s) importée(s).`);
   }
+  function handleExportRecipes() {
+    if (recipes.length === 0) {
+      return;
+    }
+
+    const text = exportRecipesToText(recipes);
+
+    downloadTextFile("meal-shuffle-recettes.txt", text);
+  }
 
   return (
     <main className="min-h-screen bg-neutral-950 text-neutral-50">
@@ -73,14 +83,22 @@ export function RecipesScreen({
           />
         </label>
 
-        <div className="mt-4 mb-6 flex justify-end">
-          {" "}
+        <div className="mt-4 mb-6 flex flex-wrap justify-start gap-2 sm:justify-end">
           <button
             type="button"
             onClick={() => setIsImportOpen((currentValue) => !currentValue)}
-            className="rounded-full border border-zinc-800 bg-zinc-950 px-4 py-2 text-sm font-medium text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-900 hover:text-white"
+            className="rounded-full border border-neutral-800 bg-neutral-950 px-4 py-2 text-sm font-medium text-neutral-300 transition hover:border-neutral-700 hover:bg-neutral-900 hover:text-white"
           >
             {isImportOpen ? "Masquer l’import" : "Importer .txt"}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleExportRecipes}
+            disabled={recipes.length === 0}
+            className="rounded-full border border-neutral-800 bg-neutral-950 px-4 py-2 text-sm font-medium text-neutral-300 transition hover:border-neutral-700 hover:bg-neutral-900 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            Exporter .txt
           </button>
         </div>
 
