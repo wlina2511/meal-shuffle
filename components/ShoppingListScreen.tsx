@@ -14,22 +14,26 @@ type ShoppingListScreenProps = {
   onToggleItem: (itemId: string) => void;
   onAddManualIngredient: (rawLine: string) => void;
   onBack: () => void;
+  onClearCheckedItems: () => void;
 };
 
 export function ShoppingListScreen({
   items,
   checkedItemIds,
   onToggleItem,
+  onClearCheckedItems,
   onAddManualIngredient,
   onBack,
 }: ShoppingListScreenProps) {
   const checkedCount = checkedItemIds.length;
   const totalCount = items.length;
   const categories = groupShoppingListByCategory(items);
-
-  const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "error">(
-    "idle",
+  const uncheckedItems = items.filter(
+    (item) => !checkedItemIds.includes(item.id),
   );
+  const uncheckedCategories = groupShoppingListByCategory(uncheckedItems);
+
+  const [copyStatus, setCopyStatus] = useState("");
   const [manualIngredientInput, setManualIngredientInput] = useState("");
   const [manualAddFeedback, setManualAddFeedback] = useState("");
 
@@ -38,18 +42,29 @@ export function ShoppingListScreen({
 
     try {
       await navigator.clipboard.writeText(text);
-      setCopyStatus("copied");
+      setCopyStatus("Liste copiée.");
 
       window.setTimeout(() => {
-        setCopyStatus("idle");
+        setCopyStatus("");
       }, 1500);
     } catch {
-      setCopyStatus("error");
+      setCopyStatus("Impossible de copier la liste.");
 
       window.setTimeout(() => {
-        setCopyStatus("idle");
+        setCopyStatus("");
       }, 2000);
     }
+  }
+  async function copyUncheckedShoppingList() {
+    if (uncheckedItems.length === 0) {
+      setCopyStatus("Tous les articles sont déjà cochés.");
+      return;
+    }
+
+    const text = formatShoppingListForText(uncheckedCategories);
+    await navigator.clipboard.writeText(text);
+
+    setCopyStatus("Articles restants copiés.");
   }
 
   function handleAddManualIngredient(event: React.FormEvent<HTMLFormElement>) {
@@ -92,22 +107,49 @@ export function ShoppingListScreen({
           </p>
 
           {items.length > 0 && (
-            <button
-              onClick={copyShoppingList}
-              className={`mt-4 rounded-2xl px-5 py-3 text-left text-sm font-semibold transition ${
-                copyStatus === "copied"
-                  ? "bg-green-950 text-green-200"
-                  : copyStatus === "error"
-                    ? "bg-red-950 text-red-200"
-                    : "bg-neutral-50 text-neutral-950"
-              }`}
-            >
-              {copyStatus === "copied"
-                ? "Liste copiée"
-                : copyStatus === "error"
-                  ? "Copie impossible"
-                  : "Copier la liste"}
-            </button>
+            <div className="mt-4 rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
+              <div className="flex items-center justify-between gap-4">
+                <p className="text-sm text-neutral-400">
+                  {checkedCount} / {totalCount} article
+                  {totalCount > 1 ? "s" : ""} coché
+                  {checkedCount > 1 ? "s" : ""}
+                </p>
+
+                {checkedCount > 0 && (
+                  <button
+                    type="button"
+                    onClick={onClearCheckedItems}
+                    className="text-sm font-medium text-neutral-400 underline underline-offset-4 hover:text-neutral-200"
+                  >
+                    Tout décocher
+                  </button>
+                )}
+              </div>
+
+              <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={copyShoppingList}
+                  disabled={items.length === 0}
+                  className="rounded-xl bg-emerald-500 px-4 py-3 text-sm font-semibold text-black transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Copier toute la liste
+                </button>
+
+                <button
+                  type="button"
+                  onClick={copyUncheckedShoppingList}
+                  disabled={uncheckedItems.length === 0}
+                  className="rounded-xl border border-neutral-800 bg-neutral-950 px-4 py-3 text-sm font-semibold text-neutral-200 transition hover:border-neutral-700 hover:bg-neutral-900 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Copier les restants
+                </button>
+              </div>
+
+              {copyStatus && (
+                <p className="mt-3 text-sm text-emerald-400">{copyStatus}</p>
+              )}
+            </div>
           )}
         </header>
 

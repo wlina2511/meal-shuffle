@@ -235,6 +235,7 @@ export default function HomePage() {
         }}
         onAddManualIngredient={addManualShoppingIngredient}
         onBack={() => setScreen("home")}
+        onClearCheckedItems={() => setCheckedShoppingItems([])}
       />
     );
   }
